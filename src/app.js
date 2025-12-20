@@ -5,6 +5,9 @@ const morgan = require("morgan");
 const config = require("./config");
 const routes = require("./routes");
 const { notFoundHandler, errorHandler } = require("./middlewares/errorHandlers");
+const userRoutes = require("./modules/users/routes/user.routes");
+const roleRoutes = require("./modules/roles/routes/roles.routes");
+const cargoRoutes = require("./modules/cargo/routes/cargo.routes");
 
 const app = express();
 
@@ -31,12 +34,16 @@ app.use(cookieParser());
 app.use(config.csrf.doubleCsrfProtection);
 
 // CSRF token endpoint 
-app.get("/csrf-token", (req, res) => {
-    res.json({ csrfToken: req.csrfToken() });
+app.get("/api/csrf-token", (req, res) => {
+    const token = req.csrfToken();
+    res.json({ csrfToken: token });
 });
 
 // Rutas
 app.use("/api", routes);
+app.use("/api/users", userRoutes);
+app.use("/api/roles", roleRoutes);
+app.use("/api/cargos", cargoRoutes);
 
 // 404
 app.use(notFoundHandler);
