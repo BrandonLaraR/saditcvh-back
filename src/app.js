@@ -6,6 +6,8 @@ const config = require("./config");
 const routes = require("./routes");
 const { notFoundHandler, errorHandler } = require("./middlewares/errorHandlers");
 
+const ejemploRoutes = require('./modules/reports/routes/ejemplo.routes');
+
 const app = express();
 
 app.disable("etag");
@@ -27,15 +29,32 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
-// CSRF 
-app.use(config.csrf.doubleCsrfProtection);
+// ==============================================
+// CSRF - CON EXCLUSIÓN PARA REPORTES
+// ==============================================
+app.use((req, res, next) => {
+  // Excluir rutas de reportes de la validación CSRF
+  if (req.path.startsWith('/api/reports') || req.path.startsWith('/api/reportes')) {
+    console.log(`✅ Saltando CSRF para: ${req.path}`);
+    return next();
+  }
+  // Para otras rutas, aplicar CSRF normalmente
+  config.csrf.doubleCsrfProtection(req, res, next);
+});
 
 // CSRF token endpoint 
 app.get("/csrf-token", (req, res) => {
     res.json({ csrfToken: req.csrfToken() });
 });
 
-// Rutas
+// ==============================================
+// RUTAS
+// ==============================================
+
+// Ruta de ejemplo (sin autenticación para pruebas)
+app.use('/api/reports', ejemploRoutes);
+
+// Rutas principales
 app.use("/api", routes);
 
 // 404
