@@ -11,6 +11,7 @@ const cargoRoutes = require("./modules/cargo/routes/cargo.routes");
 const municipioRoutes = require("./modules/municipios/routes/municipio.routes");
 const permissionRoutes = require("./modules/permissions/routes/permission.routes");
 const auditRoutes = require("./modules/audit/routes/audit.routes");
+const path = require("path");
 
 const app = express();
 
@@ -20,6 +21,17 @@ app.use((req, res, next) => {
     next();
 });
 app.use(config.helmet);
+
+app.use('/storage', (req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; frame-ancestors *"
+  );
+  next();
+});
+
+app.use('/storage', express.static(path.join(__dirname, '../storage')));
+
 app.use(config.rateLimiter);
 app.use(config.cors);
 
