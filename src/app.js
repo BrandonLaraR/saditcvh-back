@@ -5,8 +5,14 @@ const morgan = require("morgan");
 const config = require("./config");
 const routes = require("./routes");
 const { notFoundHandler, errorHandler } = require("./middlewares/errorHandlers");
-
+const userRoutes = require("./modules/users/routes/user.routes");
+const roleRoutes = require("./modules/roles/routes/roles.routes");
+const cargoRoutes = require("./modules/cargo/routes/cargo.routes");
+// Cambia en app.js:
+const reporteUsuariosRoutes = require('./modules/reports/routes/reporte-usuarios.routes');
 const ejemploRoutes = require('./modules/reports/routes/ejemplo.routes');
+const dashboardRoutes = require('./modules/dashboard/routes/dashboard.routes');
+const DigitalizationReportService = require('./modules/reports/routes/reporte-documentos.routes');
 
 const app = express();
 
@@ -43,8 +49,9 @@ app.use((req, res, next) => {
 });
 
 // CSRF token endpoint 
-app.get("/csrf-token", (req, res) => {
-    res.json({ csrfToken: req.csrfToken() });
+app.get("/api/csrf-token", (req, res) => {
+    const token = req.csrfToken();
+    res.json({ csrfToken: token });
 });
 
 // ==============================================
@@ -53,9 +60,15 @@ app.get("/csrf-token", (req, res) => {
 
 // Ruta de ejemplo (sin autenticación para pruebas)
 app.use('/api/reports', ejemploRoutes);
+app.use('/api/reports/reporte-usuarios', reporteUsuariosRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports/reporte-digitalizacion', DigitalizationReportService);
 
 // Rutas principales
 app.use("/api", routes);
+app.use("/api/users", userRoutes);
+app.use("/api/roles", roleRoutes);
+app.use("/api/cargos", cargoRoutes);
 
 // 404
 app.use(notFoundHandler);
