@@ -25,7 +25,15 @@ const Permission = sequelize.define("Permission", {
     active: { 
         type: DataTypes.BOOLEAN,
         defaultValue: true 
-    }
+    },
+type: { 
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'action',
+    field: 'permission_type'
+},
+
+
 }, {
     tableName: "permissions",
     schema: "public",
