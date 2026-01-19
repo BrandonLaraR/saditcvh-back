@@ -142,7 +142,7 @@ class AutorizacionService {
             const normalizarNombreCarpeta = (texto) => {
                 return texto
                     .replace(/[-\s]/g, '_')
-                    .replace(/_/g, '\\_'); // esto está bien
+                    .replace(/_/g, '\\_'); 
             };
 
             const searchCondition = exactMatch
@@ -215,7 +215,7 @@ class AutorizacionService {
                         required: false
                     },
                     {
-                        model: this.tiposAutorizacionModel, // ✅ CORRECTO
+                        model: this.tiposAutorizacionModel, 
                         as: 'tipoAutorizacion',
                         attributes: ['id', 'nombre', 'abreviatura'],
                         required: false
