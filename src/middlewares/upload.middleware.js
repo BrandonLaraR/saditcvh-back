@@ -1,6 +1,7 @@
 const multer = require("multer");
 
-const MAX_FILE_SIZE = 300 * 1024 * 1024;
+// const MAX_FILE_SIZE = 300 * 1024 * 1024;
+const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024;
 
 const ALLOWED_MIME_TYPES = [
   'application/pdf',

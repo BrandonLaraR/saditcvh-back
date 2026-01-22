@@ -8,4 +8,5 @@ router.use("/autorizacion", require("./modules/explorer/routes/autorizacion.rout
 router.use("/modalidades", require("./modules/explorer/routes/modalidad.routes"));
 router.use("/tipos-autorizacion", require("./modules/explorer/routes/tipos-autorizacion.routes"));
 router.use("/documentos", require("./modules/explorer/routes/documento.routes"));
+router.use("/carga-masiva", require("./modules/digitalizacion/routes/carga-masiva.routes"));
 module.exports = router;
