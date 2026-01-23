@@ -30,7 +30,7 @@ const storagePDFs = multer.memoryStorage();
 const uploadPDFs = multer({
     storage: storagePDFs,
     limits: {
-        fileSize: 100 * 1024 * 1024, // 100MB por archivo
+        fileSize:  2 * 1024 * 1024 * 1024,  // 100MB por archivo
         files: 50 // Máximo 50 archivos a la vez
     },
     fileFilter: (req, file, cb) => {
