@@ -18,6 +18,7 @@ class PDFUploadResponse(BaseModel):
     task_id: str  # ID de la tarea en Celery
     status: str  # "pending", "processing", "completed", "failed"
     message: str
+    pages: Optional[int] = None #  número de páginas
     estimated_wait_time: Optional[float] = None  # segundos estimados
 
 

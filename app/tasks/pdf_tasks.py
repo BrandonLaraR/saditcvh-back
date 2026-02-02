@@ -1,3 +1,5 @@
+
+
 from celery import shared_task
 import logging
 import subprocess
@@ -6,6 +8,14 @@ from app.services.pdf_service import PDFService
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
+BASE_DIR = os.path.abspath(os.getcwd())
+
+OCRMY_PDF = os.path.join(
+    BASE_DIR,
+    "venv",
+    "Scripts",
+    "ocrmypdf.exe"
+)
 
 @shared_task(bind=True, name="process_pdf_task")
 def process_pdf_task(self, pdf_id: str, pdf_path: str, use_ocr: bool = True):
@@ -31,9 +41,8 @@ def process_pdf_task(self, pdf_id: str, pdf_path: str, use_ocr: bool = True):
 
         ocr_pdf_path = os.path.join(settings.OUTPUTS_FOLDER, f"{pdf_id}.pdf")
         os.makedirs(settings.OUTPUTS_FOLDER, exist_ok=True)
-
         command = [
-            "ocrmypdf",
+            OCRMY_PDF,
             "-l", "spa",
             "--force-ocr",
             "--optimize", "0",
@@ -42,6 +51,17 @@ def process_pdf_task(self, pdf_id: str, pdf_path: str, use_ocr: bool = True):
             pdf_path,
             ocr_pdf_path
         ]
+
+        # command = [
+        #     "ocrmypdf",
+        #     "-l", "spa",
+        #     "--force-ocr",
+        #     "--optimize", "0",
+        #     "--output-type", "pdf",
+        #     "--jpeg-quality", "100",
+        #     pdf_path,
+        #     ocr_pdf_path
+        # ]
 
         logger.info(f"Ejecutando comando: {' '.join(command)}")
 

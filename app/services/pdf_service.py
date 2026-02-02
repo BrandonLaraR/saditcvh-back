@@ -19,6 +19,8 @@ import gc
 import gzip
 from app.core.state import pdf_storage, pdf_task_status
 
+from PyPDF2 import PdfReader
+from io import BytesIO
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -400,3 +402,10 @@ class PDFService:
         logger.info(f"PDF con OCRmyPDF GUARDADO: {filepath}")
         
         return str(filepath)
+    def get_pdf_pages_count(self, file_bytes: bytes) -> int:
+        """
+        Obtiene el número de páginas de un PDF sin guardarlo en disco
+        y sin usar OCR.
+        """
+        reader = PdfReader(BytesIO(file_bytes))
+        return len(reader.pages)

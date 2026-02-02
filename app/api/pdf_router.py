@@ -44,7 +44,8 @@ async def upload_pdf(file: UploadFile = File(...), use_ocr: bool = Query(True)):
         
         file_bytes = await file.read()
         pdf_id = pdf_service.generate_pdf_id(file.filename, file_bytes)
-        
+        pages_count = pdf_service.get_pdf_pages_count(file_bytes)
+
         # 1. Guardar archivo PDF
         pdf_path = os.path.join(settings.UPLOAD_FOLDER, f"{pdf_id}.pdf")
         with open(pdf_path, "wb") as f:
@@ -65,7 +66,8 @@ async def upload_pdf(file: UploadFile = File(...), use_ocr: bool = Query(True)):
             'size': len(file_bytes),
             'upload_time': time.time(),
             'task_id': task.id,
-            'use_ocr': use_ocr
+            'use_ocr': use_ocr,
+            'pages': pages_count
         }
         
         pdf_task_status[pdf_id] = {
@@ -73,7 +75,7 @@ async def upload_pdf(file: UploadFile = File(...), use_ocr: bool = Query(True)):
             'status': 'pending',
             'created_at': now,
             'completed_at': None,
-            'pages': None,
+            'pages': pages_count,
             'extracted_text_path': None,
             'used_ocr': use_ocr,
             'error': None
@@ -124,7 +126,8 @@ async def upload_pdf(file: UploadFile = File(...), use_ocr: bool = Query(True)):
                 task_id=task.id,
                 status="pending",
                 message="PDF aceptado y procesando localmente (no hay workers).",
-                estimated_wait_time=0.0
+                estimated_wait_time=0.0 ,
+                pages=pages_count,
             )
 
         # Si hay workers, devolvemos response pendiente como antes
@@ -136,6 +139,7 @@ async def upload_pdf(file: UploadFile = File(...), use_ocr: bool = Query(True)):
             status="pending",
             message="PDF encolado para procesamiento. Usa el endpoint /upload-status/{pdf_id} para consultar el progreso",
             estimated_wait_time=10.0  # Estimado en segundos
+            ,pages=pages_count,
         )
         
     except Exception as e:
