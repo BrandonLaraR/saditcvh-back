@@ -3,7 +3,7 @@ from app.core.config import settings
 import os
 
 # Configurar TESSDATA_PREFIX ANTES de importar cualquier cosa de Tesseract
-os.environ['TESSDATA_PREFIX'] = r'C:\Program Files\Tesseract-OCR\tessdata'
+os.environ['TESSDATA_PREFIX'] = '/usr/share/tesseract-ocr/5/tessdata'
 
 # Luego continúa con tus imports
 from fastapi import FastAPI

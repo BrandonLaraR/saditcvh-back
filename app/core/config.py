@@ -15,7 +15,7 @@ class Settings:
     # Nueva carpeta centralizada para los PDFs y Textos finales
     OUTPUTS_FOLDER = os.getenv("OUTPUTS_FOLDER", "outputs")
     # ---------------------------
-    TESSERACT_CMD = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    TESSERACT_CMD = "/usr/bin/tesseract"
             # Configuración de procesamiento
     MAX_FILE_SIZE = 200 * 1024 * 1024  # 200MB máximo
     DEFAULT_DPI = 200

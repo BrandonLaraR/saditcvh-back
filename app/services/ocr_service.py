@@ -4,6 +4,8 @@ import pytesseract
 from PIL import Image
 import io
 import concurrent.futures
+
+
 import logging
 from typing import List, Tuple, Optional
 import numpy as np
@@ -203,3 +205,4 @@ class OCRService:
         except Exception as e:
             logger.error(f"Error en extracción con fallback: {e}")
             return "", False
+
