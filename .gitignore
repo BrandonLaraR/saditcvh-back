@@ -1,48 +1,51 @@
-# ================================
-# Python
-# ================================
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.log
-
-# Entornos virtuales
-venv/
+# env
 .env
+.env.local
+.env.*.local
 
-# ================================
-# FastAPI / Uvicorn
-# ================================
-*.sqlite3
-*.db
 
-# ================================
-# Archivos subidos / procesados
-# ================================
-uploads/
-*.pdf
-*.txt
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
 
-# ================================
-# OCR / Procesamiento
-# ================================
-*.ppm
-*.pgm
-*.png
-*.jpg
-*.jpeg
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
 
-# ================================
-# IDEs y editores
-# ================================
-.vscode/
+# IDEs and editors
 .idea/
-*.swp
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
-# ================================
-# Sistema operativo
-# ================================
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# System files
 .DS_Store
 Thumbs.db
 
+
+
+/storage/
