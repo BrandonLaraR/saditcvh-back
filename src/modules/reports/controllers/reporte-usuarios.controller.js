@@ -80,7 +80,6 @@ class UsersReportController {
         try {
           doc.image(escudoPath, 40, 25, { width: 70, height: 70 });
         } catch (err) {
-
         }
       }
       
@@ -898,7 +897,6 @@ if (user.permissions && user.permissions.length > 0) {
         try {
           doc.end();
         } catch (e) {
-
         }
       }
       
@@ -911,7 +909,6 @@ if (user.permissions && user.permissions.length > 0) {
           stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
       } else {
-
       }
     }
   }

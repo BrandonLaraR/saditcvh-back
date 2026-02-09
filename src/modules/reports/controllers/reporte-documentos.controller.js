@@ -34,7 +34,6 @@ class DigitalizationReportController {
           data: []
         });
       }
-
       doc = new PDFDocument({
         size: 'A4',
         margin: 40,
@@ -1160,7 +1159,6 @@ class DigitalizationReportController {
         try {
           doc.end();
         } catch (e) {
-
         }
       }
       
@@ -1173,7 +1171,6 @@ class DigitalizationReportController {
           stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
       } else {
-
       }
     }
   }

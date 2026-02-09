@@ -1,4 +1,5 @@
 const axios = require('axios');
+const FormData = require('form-data');
 
 class OCRProcessorService {
     constructor() {
@@ -13,15 +14,18 @@ class OCRProcessorService {
     async enviarPDFParaOCR(pdfBuffer, filename) {
         try {
             const formData = new FormData();
-            const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
-            formData.append('file', blob, filename);
-            
+
+            formData.append('file', pdfBuffer, {
+                filename,
+                contentType: 'application/pdf'
+            });
+
             const response = await axios.post(
                 `${this.pythonBaseURL}/upload?use_ocr=true`,
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        ...formData.getHeaders()
                     },
                     timeout: 120000
                 }
@@ -33,90 +37,138 @@ class OCRProcessorService {
                 pythonPdfId: response.data.pdf_id,
                 status: 'processing'
             };
+
         } catch (error) {
-            console.error('Error enviando PDF a Python:', error.message);
+            console.error('Error enviando PDF a Python:',
+                error.response?.data || error.message
+            );
+
+            return {
+                success: false,
+                error: error.response?.data || error.message
+            };
+        }
+    }
+
+
+    /**
+     * Polling para verificar estado del procesamiento
+     */
+    // async verificarEstadoOCR(taskId, maxWaitSeconds = 300) {
+    //     const maxAttempts = Math.ceil(maxWaitSeconds * 1000 / this.pollingInterval);
+
+    //     for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    //         try {
+    //             const response = await axios.get(`${this.pythonBaseURL}/list`);
+
+
+    //             const pdfs = response.data.pdfs || [];
+    //             const task = pdfs.find(t => t.task_id === taskId);
+
+    //             if (!task) {
+    //                 throw new Error(`Tarea ${taskId} no encontrada en la lista`);
+    //             }
+
+    //             if (task.status === 'completed') {
+    //                 return {
+    //                     success: true,
+    //                     status: 'completed',
+    //                     pythonPdfId: task.id,
+    //                     extractedTextPath: task.extracted_text_path
+    //                 };
+    //             }
+    //             else if (task.status === 'failed') {
+    //                 return {
+    //                     success: false,
+    //                     status: 'failed',
+    //                     error: task.error || 'Procesamiento OCR falló'
+    //                 };
+    //             }
+
+    //             // Sigue esperando si está processing o pending
+    //             if (attempt < maxAttempts - 1) {
+    //                 await new Promise(resolve => setTimeout(resolve, this.pollingInterval));
+    //             }
+
+    //         } catch (error) {
+    //             console.error(`Error en polling (intento ${attempt + 1}):`, error.message);
+    //         }
+    //     }
+
+    //     return {
+    //         success: false,
+    //         status: 'timeout',
+    //         error: 'Timeout esperando procesamiento OCR'
+    //     };
+    // }
+
+  /**
+     * Verificar estado de OCR - SIN polling interno
+     */
+    async verificarEstadoOCRUnico(taskId, timeoutMs = 10000) {
+        try {
+            // Hacer UNA sola consulta a Python
+            const response = await axios.get(`${this.pythonBaseURL}/list`, {
+                timeout: timeoutMs
+            });
+
+            const pdfs = response.data.pdfs || [];
+            const task = pdfs.find(t => t.task_id === taskId);
+
+            if (!task) {
+                return {
+                    success: false,
+                    error: 'Tarea no encontrada en Python',
+                    status: 'pending'
+                };
+            }
+
+            return {
+                success: task.status === 'completed',
+                status: task.status,
+                pythonPdfId: task.id,
+                extractedTextPath: task.extracted_text_path,
+                error: task.error
+            };
+
+        } catch (error) {
+            console.error(`Error verificando estado OCR: ${error.message}`);
+            return {
+                success: false,
+                error: error.message,
+                status: 'error'
+            };
+        }
+    }
+    async listarProcesos(timeoutMs = 10000) {
+        const response = await axios.get(`${this.pythonBaseURL}/list`, {
+            timeout: timeoutMs
+        });
+        return response.data;
+    }
+    /**
+     * Descargar PDF procesado con OCR
+     */
+    async descargarPDFConOCR(pdfId) {
+        try {
+            const response = await axios.get(
+                `${this.pythonBaseURL}/${pdfId}/searchable-pdf`,
+                { responseType: 'arraybuffer' }
+            );
+
+            return {
+                success: true,
+                pdfBuffer: Buffer.from(response.data),
+                contentType: response.headers['content-type'] || 'application/pdf'
+            };
+        } catch (error) {
+            console.error('Error descargando PDF con OCR:', error.message);
             return {
                 success: false,
                 error: error.message
             };
         }
     }
-
-    /**
-     * Polling para verificar estado del procesamiento
-     */
-async verificarEstadoOCR(taskId, maxWaitSeconds = 300) {
-    const maxAttempts = Math.ceil(maxWaitSeconds * 1000 / this.pollingInterval);
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        try {
-            const response = await axios.get(`${this.pythonBaseURL}/list`);
-
-           
-            const pdfs = response.data.pdfs || [];
-            const task = pdfs.find(t => t.task_id === taskId);
-
-            if (!task) {
-                throw new Error(`Tarea ${taskId} no encontrada en la lista`);
-            }
-
-            if (task.status === 'completed') {
-                return {
-                    success: true,
-                    status: 'completed',
-                    pythonPdfId: task.id,
-                    extractedTextPath: task.extracted_text_path
-                };
-            } 
-            else if (task.status === 'failed') {
-                return {
-                    success: false,
-                    status: 'failed',
-                    error: task.error || 'Procesamiento OCR falló'
-                };
-            }
-
-            // Sigue esperando si está processing o pending
-            if (attempt < maxAttempts - 1) {
-                await new Promise(resolve => setTimeout(resolve, this.pollingInterval));
-            }
-
-        } catch (error) {
-            console.error(`Error en polling (intento ${attempt + 1}):`, error.message);
-        }
-    }
-
-    return {
-        success: false,
-        status: 'timeout',
-        error: 'Timeout esperando procesamiento OCR'
-    };
-}
-
-
-    /**
-     * Descargar PDF procesado con OCR
-     */
-async descargarPDFConOCR(pdfId) {
-    try {
-        const response = await axios.get(
-            `${this.pythonBaseURL}/${pdfId}/searchable-pdf`,
-            { responseType: 'arraybuffer' }
-        );
-
-        return {
-            success: true,
-            pdfBuffer: Buffer.from(response.data),
-            contentType: response.headers['content-type'] || 'application/pdf'
-        };
-    } catch (error) {
-        console.error('Error descargando PDF con OCR:', error.message);
-        return {
-            success: false,
-            error: error.message
-        };
-    }
-}
 
 
     /**
@@ -125,7 +177,7 @@ async descargarPDFConOCR(pdfId) {
     async descargarTextoOCR(pdfId) {
         try {
             const response = await axios.get(`${this.pythonBaseURL}/${pdfId}/text`);
-            
+
             return {
                 success: true,
                 text: response.data.text || response.data
