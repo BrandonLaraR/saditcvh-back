@@ -9,11 +9,7 @@ class DigitalizationReportController {
   async generarReporteDigitalizacionPDF(req, res) {
     let doc = null;
     
-    try {
-      console.log('=== GENERANDO REPORTE DE DIGITALIZACIÓN ===');
-      console.log('Filtros aplicados:', req.query);
-      console.log('Timestamp:', new Date().toISOString());
-      
+    try {   
       const filters = {
         tipo_autorizacion_id: req.query.tipo_autorizacion_id, 
         modalidad_id: req.query.modalidad_id,
@@ -38,14 +34,7 @@ class DigitalizationReportController {
           data: []
         });
       }
-      
-      // Log para depuración
-      console.log('📊 Total documentos encontrados:', report.metadata?.total_documents || 0);
-      console.log('💾 Documentos digitalizados:', report.metadata?.digitalized_documents || 0);
-      console.log('📄 Tamaño total archivos (MB):', report.metadata?.total_file_size_mb?.toFixed(2) || 0);
-      console.log('📖 Total páginas digitalizadas:', report.metadata?.total_pages_digitalized || 0);
-      console.log('🚌 Modalidades encontradas:', report.metadata?.distribution_by_modalidad?.length || 0);
-      
+
       doc = new PDFDocument({
         size: 'A4',
         margin: 40,
@@ -93,7 +82,6 @@ class DigitalizationReportController {
         try {
           doc.image(escudoPath, 40, 25, { width: 70, height: 70 });
         } catch (err) {
-          console.log('⚠️ Error cargando escudo:', err.message);
         }
       }
       
@@ -1166,27 +1154,13 @@ class DigitalizationReportController {
       
       // Finalizar
       doc.end();
-      
-      console.log('✅ Reporte de digitalización generado exitosamente');
-      console.log(`📊 Total documentos: ${totalDocs}`);
-      console.log(`💾 Documentos digitalizados: ${digitalizados}`);
-      console.log(`📈 Porcentaje completado: ${porcentajeDigitalizacion}%`);
-      console.log(`📖 Total páginas: ${totalPaginas}`);
-      console.log(`💽 Tamaño total: ${totalSizeMB} MB`);
-      console.log(`👥 Digitalizadores top: ${report.metadata?.top_digitalizers?.length || 0}`);
-      console.log(`🚌 Modalidades analizadas: ${report.metadata?.distribution_by_modalidad?.length || 0}`);
-      console.log(`📋 Documentos incluidos: ${report.data.length}`);
-      
     } catch (error) {
-      console.error('❌ Error generando reporte de digitalización:', error);
-      console.error('❌ Stack trace:', error.stack);
-      
       // Si el documento ya comenzó a escribirse, terminarlo limpiamente
       if (doc && !doc._readableState.ended) {
         try {
           doc.end();
         } catch (e) {
-          console.error('❌ Error al finalizar documento:', e.message);
+
         }
       }
       
@@ -1199,7 +1173,7 @@ class DigitalizationReportController {
           stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
       } else {
-        console.error('❌ Error después de comenzar a escribir PDF');
+
       }
     }
   }
@@ -1209,8 +1183,6 @@ class DigitalizationReportController {
     let doc = null;
     
     try {
-      console.log('=== GENERANDO REPORTE DE RENDIMIENTO ===');
-      
       const filters = {
         start_date: req.query.start_date,
         end_date: req.query.end_date
@@ -1263,7 +1235,6 @@ class DigitalizationReportController {
       doc.end();
       
     } catch (error) {
-      console.error('❌ Error generando reporte de rendimiento:', error);
       if (doc && !doc._readableState.ended) doc.end();
       if (!res.headersSent) {
         res.status(500).json({
@@ -1278,24 +1249,17 @@ class DigitalizationReportController {
    // OBTENER ÚLTIMOS DOCUMENTOS SUBIDOS
    async getUltimosDocumentos(req, res) {
       try {
-         console.log('📄 SOLICITUD DE ÚLTIMOS DOCUMENTOS SUBIDOS');
-         console.log('Timestamp:', new Date().toISOString());
-         
          const limit = parseInt(req.query.limit) || 5;
-         console.log(`📊 Límite solicitado: ${limit} documentos`);
-         
+
          const result = await DigitalizationReportService.getUltimosDocumentos(limit);
          
          if (result.success) {
-               console.log(`✅ Últimos ${result.data.length} documentos obtenidos exitosamente`);
                res.json(result);
          } else {
-               console.error('❌ Error obteniendo últimos documentos:', result.message);
                res.status(500).json(result);
          }
          
       } catch (error) {
-         console.error('❌ Error en getUltimosDocumentos:', error);
          res.status(500).json({
                success: false,
                message: 'Error interno al obtener últimos documentos',
@@ -1307,9 +1271,6 @@ class DigitalizationReportController {
    // NUEVO: OBTENER REPORTE DETALLADO POR MODALIDAD
    async getReporteModalidadDetallado(req, res) {
       try {
-         console.log('🚌 SOLICITUD DE REPORTE POR MODALIDAD');
-         console.log('Timestamp:', new Date().toISOString());
-         
          const filters = {
             start_date: req.query.start_date,
             end_date: req.query.end_date,
@@ -1319,15 +1280,12 @@ class DigitalizationReportController {
          const result = await DigitalizationReportService.getModalidadDetailedReport(filters);
          
          if (result.success) {
-            console.log(`✅ Reporte por modalidad generado: ${result.data.length} modalidades`);
             res.json(result);
          } else {
-            console.error('❌ Error generando reporte por modalidad:', result.message);
             res.status(500).json(result);
          }
          
       } catch (error) {
-         console.error('❌ Error en getReporteModalidadDetallado:', error);
          res.status(500).json({
             success: false,
             message: 'Error interno al generar reporte por modalidad',
