@@ -14,6 +14,7 @@ const DigitalizationReportService = require('./modules/reports/routes/reporte-do
 const municipioRoutes = require("./modules/municipios/routes/municipio.routes");
 const permissionRoutes = require("./modules/permissions/routes/permission.routes");
 const auditRoutes = require("./modules/audit/routes/audit.routes");
+const backupsRoutes = require('./modules/backups/routes/backups.routes');
 const path = require("path");
 
 const app = express();
@@ -79,6 +80,7 @@ app.use("/api/cargos", cargoRoutes);
 app.use("/api/municipios", municipioRoutes);
 app.use("/api/permissions", permissionRoutes);
 app.use("/api/audit", auditRoutes);
+app.use("/api/backups", backupsRoutes);
 
 // 404
 app.use(notFoundHandler);
