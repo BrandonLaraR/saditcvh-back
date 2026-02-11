@@ -23,90 +23,51 @@ router.use((req, res, next) => {
 
 // 1. ESTADÍSTICAS PRINCIPALES PARA KPIs DEL DASHBOARD
 router.get('/estadisticas', async (req, res) => {
-  console.log('📊 SOLICITUD DE ESTADÍSTICAS DEL DASHBOARD');
-  console.log('Timestamp:', new Date().toISOString());
-  console.log('Parámetros de consulta:', req.query);
-  
   return await DashboardController.getDashboardStats(req, res);
 });
 
 // 2. ESTADÍSTICAS AVANZADAS PARA GRÁFICOS Y ANALÍTICAS
 router.get('/estadisticas/avanzadas', async (req, res) => {
-  console.log('📈 SOLICITUD DE ESTADÍSTICAS AVANZADAS DEL DASHBOARD');
-  console.log('Filtros aplicados:', req.query);
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await DashboardController.getAdvancedStats(req, res);
 });
 
 // 3. DATOS ESPECÍFICOS PARA GRÁFICAS DEL DASHBOARD
 router.get('/estadisticas/graficas', async (req, res) => {
-  console.log('📊 SOLICITUD DE DATOS PARA GRÁFICAS DEL DASHBOARD');
-  console.log('Tipo de gráficas solicitadas:', req.query.tipo || 'todas');
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await DashboardController.getChartData(req, res);
 });
 
 // 4. ESTADÍSTICAS EN TIEMPO REAL (ÚLTIMOS 5 MINUTOS)
 router.get('/estadisticas/tiempo-real', async (req, res) => {
-  console.log('⚡ SOLICITUD DE ESTADÍSTICAS EN TIEMPO REAL');
-  console.log('Intervalo:', req.query.intervalo || '5min');
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await DashboardController.getRealTimeStats(req, res);
 });
 
 // 5. TENDENCIAS Y COMPARATIVAS
 router.get('/estadisticas/tendencias', async (req, res) => {
-  console.log('📈 SOLICITUD DE ANÁLISIS DE TENDENCIAS');
-  console.log('Período:', req.query.periodo || 'mes_actual');
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await DashboardController.getTrendAnalysis(req, res);
 });
 
 // 6. ESTADÍSTICAS DIARIAS (ÚLTIMOS 7 DÍAS)
 router.get('/estadisticas/diarias', async (req, res) => {
-  console.log('📅 SOLICITUD DE ESTADÍSTICAS DIARIAS (ÚLTIMOS 7 DÍAS)');
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await DashboardController.getEstadisticasDiarias(req, res);
 });
 
 // 7. ESTADÍSTICAS POR TIPO DE DOCUMENTO (PARA GRÁFICA CIRCULAR)
 router.get('/estadisticas/tipos', async (req, res) => {
-    console.log('📊 SOLICITUD DE ESTADÍSTICAS POR TIPO DE DOCUMENTO');
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('Query params:', req.query);
-    
     return await DashboardController.getEstadisticasPorTipo(req, res);
 });
 
 // 8. ESTADÍSTICAS POR MODALIDAD (GRÁFICA DE BARRAS/CIRCULAR)
 router.get('/estadisticas/modalidad', async (req, res) => {
-    console.log('🚌 SOLICITUD DE ESTADÍSTICAS POR MODALIDAD');
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('Query params:', req.query);
-    
     return await DashboardController.getEstadisticasPorModalidad(req, res);
 });
 
 // 9. ESTADÍSTICAS POR MUNICIPIO (GRÁFICA DE MAPA/BARRAS)
 router.get('/estadisticas/municipio', async (req, res) => {
-    console.log('🗺️ SOLICITUD DE ESTADÍSTICAS POR MUNICIPIO');
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('Query params:', req.query);
-    
     return await DashboardController.getEstadisticasPorMunicipio(req, res);
 });
 
 // 10. ESTADÍSTICAS DETALLADAS POR MODALIDAD (CON FILTROS)
 router.get('/estadisticas/modalidad/detallada', async (req, res) => {
-    console.log('📊 SOLICITUD DE ESTADÍSTICAS DETALLADAS POR MODALIDAD');
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('Filtros:', req.query);
-    
     return await DashboardController.getEstadisticasModalidadDetallada(req, res);
 });
 
@@ -114,8 +75,6 @@ router.get('/estadisticas/modalidad/detallada', async (req, res) => {
 // RUTA DE PRUEBA Y ESTADO DEL SERVICIO
 // ==============================================
 router.get('/status', (req, res) => {
-  console.log('🧪 Health check del servicio de dashboard');
-  
   res.json({ 
     status: 'ok', 
     service: 'dashboard-estadisticas',
@@ -209,8 +168,6 @@ router.get('/status', (req, res) => {
 // RUTA DE EJEMPLO Y PRUEBAS
 // ==============================================
 router.get('/ejemplo', (req, res) => {
-  console.log('📋 Ejemplo de uso del dashboard API');
-  
   const ejemplos = {
     kpis_principales: {
       description: 'Obtener todos los KPIs principales para el dashboard',
@@ -383,16 +340,10 @@ router.get('/ejemplo', (req, res) => {
 // RUTAS DE MONITOREO Y MÉTRICAS DEL SISTEMA
 // ==============================================
 router.get('/monitor/performance', async (req, res) => {
-  console.log('📈 SOLICITUD DE MÉTRICAS DE PERFORMANCE DEL SISTEMA');
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await DashboardController.getSystemPerformance(req, res);
 });
 
 router.get('/monitor/database', async (req, res) => {
-  console.log('🗄️ SOLICITUD DE ESTADO DE LA BASE DE DATOS');
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await DashboardController.getDatabaseStatus(req, res);
 });
 
@@ -401,9 +352,6 @@ router.get('/monitor/database', async (req, res) => {
 // RUTA DE REINICIO DE CACHE
 // ==============================================
 router.post('/cache/clear', async (req, res) => {
-  console.log('🧹 SOLICITUD DE LIMPIEZA DE CACHE DEL DASHBOARD');
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await DashboardController.clearCache(req, res);
 });
 

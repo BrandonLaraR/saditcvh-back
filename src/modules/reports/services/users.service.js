@@ -105,15 +105,6 @@ class UsersReportService {
                 type: QueryTypes.SELECT
             });
             
-            console.log('📊 Usuarios encontrados en consulta:', users.length);
-            console.log('👤 Usuarios con detalles:', users.map(u => ({
-                id: u.id,
-                username: u.username,
-                active: u.active,
-                role: u.role_name,
-                role_id: u.role_id
-            })));
-            
             // **OBTENER PERMISOS DE MUNICIPIOS PARA CADA USUARIO**
             if (include_permissions) {
                 const usersWithPermissions = await Promise.all(
@@ -185,15 +176,6 @@ class UsersReportService {
                 // Obtener estadísticas del reporte
                 const stats = await this.getReportStatistics(filters);
                 
-                console.log('📈 Estadísticas obtenidas:', {
-                    total_all_users: stats.totalUsers,
-                    active: stats.activeUsers,
-                    inactive: stats.inactiveUsers,
-                    total_with_role: stats.totalUsersWithRole,
-                    total_without_role: stats.totalUsersWithoutRole,
-                    roles: stats.rolesDistribution
-                });
-                
                 return {
                     success: true,
                     data: processedUsers,
@@ -234,7 +216,6 @@ class UsersReportService {
             }
 
         } catch (error) {
-            console.error('❌ Error en UsersReportService.getUsersReport:', error);
             throw new Error(`Error al generar reporte de usuarios: ${error.message}`);
         }
     }
@@ -388,12 +369,6 @@ class UsersReportService {
                 type: QueryTypes.SELECT
             });
             
-            console.log('📊 Consulta stats ejecutada:', {
-                query: statsQuery,
-                params: params,
-                result: stats[0]
-            });
-            
             // DISTRIBUCIÓN POR ROLES - SOLO USUARIOS CON ROL
             const rolesQuery = `
                 SELECT 
@@ -412,8 +387,6 @@ class UsersReportService {
                 replacements: params,
                 type: QueryTypes.SELECT
             });
-            
-            console.log('🎯 Distribución por roles:', rolesDistribution);
             
             // Estadísticas de permisos
             const permissionsQuery = `
@@ -451,7 +424,6 @@ class UsersReportService {
             };
 
         } catch (error) {
-            console.error('❌ Error en UsersReportService.getReportStatistics:', error);
             return {
                 totalUsers: 0,
                 activeUsers: 0,
@@ -515,7 +487,6 @@ class UsersReportService {
             }));
             
         } catch (error) {
-            console.error('❌ Error obteniendo permisos de municipios del usuario:', error);
             return [];
         }
     }
@@ -565,7 +536,6 @@ class UsersReportService {
             };
             
         } catch (error) {
-            console.error('❌ Error en UsersReportService.getPermissionsByMunicipalityReport:', error);
             throw new Error(`Error al generar reporte por municipios: ${error.message}`);
         }
     }

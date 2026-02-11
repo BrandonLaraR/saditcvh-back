@@ -24,43 +24,26 @@ router.use((req, res, next) => {
 
 // 1. GENERAR REPORTE DE DIGITALIZACIÓN EN PDF
 router.get('/pdf', async (req, res) => {
-  console.log('📄 SOLICITUD DE REPORTE DE DIGITALIZACIÓN (PDF)');
-  console.log('Filtros:', req.query);
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await ReporteDigitalizacionController.generarReporteDigitalizacionPDF(req, res);
 });
 
 // 2. GENERAR REPORTE DE RENDIMIENTO DE DIGITALIZADORES EN PDF
 router.get('/rendimiento/pdf', async (req, res) => {
-  console.log('📊 SOLICITUD DE REPORTE DE RENDIMIENTO (PDF)');
-  console.log('Filtros:', req.query);
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await ReporteDigitalizacionController.generarReporteRendimientoPDF(req, res);
 });
 
 // 3. OBTENER REPORTE DETALLADO POR MODALIDAD (NUEVA RUTA)
 router.get('/modalidad/detallado', async (req, res) => {
-  console.log('🚌 SOLICITUD DE REPORTE DETALLADO POR MODALIDAD');
-  console.log('Filtros:', req.query);
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await ReporteDigitalizacionController.getReporteModalidadDetallado(req, res);
 });
 
 // 4. OBTENER ÚLTIMOS DOCUMENTOS SUBIDOS
 router.get('/ultimos-documentos', async (req, res) => {
-  console.log('📄 SOLICITUD DE ÚLTIMOS DOCUMENTOS SUBIDOS');
-  console.log('Límite solicitado:', req.query.limit || 5);
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await ReporteDigitalizacionController.getUltimosDocumentos(req, res);
 });
 
 // 5. RUTA DE PRUEBA Y ESTADO DEL SERVICIO
 router.get('/status', (req, res) => {
-  console.log('🧪 Health check del servicio de reportes de digitalización');
   res.json({ 
     status: 'ok', 
     service: 'reportes-digitalizacion',
@@ -245,8 +228,6 @@ router.get('/status', (req, res) => {
 // RUTA DE EJEMPLO Y PRUEBAS (ACTUALIZADA)
 // ==============================================
 router.get('/ejemplo', (req, res) => {
-  console.log('📋 Ejemplo de parámetros para reportes de digitalización');
-  
   const ejemploReporteGeneral = {
     tipo_autorizacion_id: '1',
     modalidad_id: '3',

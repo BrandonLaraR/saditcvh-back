@@ -23,16 +23,11 @@ router.use((req, res, next) => {
 
 // 1. GENERAR REPORTE DE USUARIOS EN PDF
 router.get('/pdf', async (req, res) => {
-  console.log('📄 SOLICITUD DE REPORTE DE USUARIOS (PDF)');
-  console.log('Filtros:', req.query);
-  console.log('Timestamp:', new Date().toISOString());
-  
   return await ReporteUsuariosController.generarReporteUsuariosPDF(req, res);
 });
 
 // 2. RUTA DE PRUEBA Y ESTADO DEL SERVICIO
 router.get('/status', (req, res) => {
-  console.log('🧪 Health check del servicio de reportes de usuarios');
   res.json({ 
     status: 'ok', 
     service: 'reportes-usuarios',

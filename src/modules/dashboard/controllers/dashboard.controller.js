@@ -7,13 +7,10 @@ class DashboardController {
      */
     async getDashboardStats(req, res) {
         try {
-            console.log('📊 Procesando solicitud de estadísticas del dashboard...');
             const startTime = Date.now();
             
             const result = await DashboardService.getDashboardStats();
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Estadísticas generadas en ${processingTime}ms`);
             
             // Agregar tiempo de procesamiento a la respuesta
             if (result.success && result.metadata) {
@@ -23,7 +20,6 @@ class DashboardController {
             
             res.json(result);
         } catch (error) {
-            console.error('❌ Error en DashboardController.getDashboardStats:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error interno del servidor al obtener estadísticas',
@@ -38,14 +34,11 @@ class DashboardController {
      */
     async getAdvancedStats(req, res) {
         try {
-            console.log('📈 Procesando solicitud de estadísticas avanzadas...');
             const filters = req.query;
             const startTime = Date.now();
             
             const result = await DashboardService.getAdvancedStats(filters);
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Estadísticas avanzadas generadas en ${processingTime}ms`);
             
             if (result.success) {
                 result.metadata = {
@@ -59,7 +52,6 @@ class DashboardController {
                 res.status(500).json(result);
             }
         } catch (error) {
-            console.error('❌ Error en DashboardController.getAdvancedStats:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al obtener estadísticas avanzadas',
@@ -74,13 +66,10 @@ class DashboardController {
      */
     async getChartData(req, res) {
         try {
-            console.log('📊 Procesando solicitud de datos para gráficas...');
             const startTime = Date.now();
             
             const result = await DashboardService.getChartData();
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Datos para gráficas generados en ${processingTime}ms`);
             
             if (result.success) {
                 result.metadata = {
@@ -93,7 +82,6 @@ class DashboardController {
                 res.status(500).json(result);
             }
         } catch (error) {
-            console.error('❌ Error en DashboardController.getChartData:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al obtener datos para gráficas',
@@ -108,15 +96,12 @@ class DashboardController {
      */
     async getRealTimeStats(req, res) {
         try {
-            console.log('⚡ Procesando solicitud de estadísticas en tiempo real...');
             const intervalo = req.query.intervalo || '5min';
             const startTime = Date.now();
             
             // Llamar al servicio correspondiente (debes implementarlo en el servicio)
             const result = await DashboardService.getRealTimeStats(intervalo);
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Estadísticas en tiempo real generadas en ${processingTime}ms`);
             
             if (result.success) {
                 result.metadata = {
@@ -131,7 +116,6 @@ class DashboardController {
                 res.status(500).json(result);
             }
         } catch (error) {
-            console.error('❌ Error en DashboardController.getRealTimeStats:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al obtener estadísticas en tiempo real',
@@ -146,15 +130,12 @@ class DashboardController {
      */
     async getTrendAnalysis(req, res) {
         try {
-            console.log('📈 Procesando análisis de tendencias...');
             const periodo = req.query.periodo || 'mes_actual';
             const startTime = Date.now();
             
             // Llamar al servicio correspondiente (debes implementarlo en el servicio)
             const result = await DashboardService.getTrendAnalysis(periodo);
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Análisis de tendencias generado en ${processingTime}ms`);
             
             if (result.success) {
                 result.metadata = {
@@ -168,7 +149,6 @@ class DashboardController {
                 res.status(500).json(result);
             }
         } catch (error) {
-            console.error('❌ Error en DashboardController.getTrendAnalysis:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al realizar análisis de tendencias',
@@ -212,7 +192,6 @@ class DashboardController {
             
             res.json(performanceData);
         } catch (error) {
-            console.error('❌ Error en getSystemPerformance:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al obtener métricas de performance',
@@ -235,7 +214,6 @@ class DashboardController {
                 timestamp: new Date().toISOString()
             });
         } catch (error) {
-            console.error('❌ Error en getDatabaseStatus:', error);
             res.status(503).json({
                 success: false,
                 message: 'Error de conexión a la base de datos',
@@ -250,8 +228,6 @@ class DashboardController {
      */
     async clearCache(req, res) {
         try {
-            // Implementar lógica de limpieza de cache si es necesario
-            console.log('🧹 Limpiando cache del dashboard...');
             
             res.json({
                 success: true,
@@ -264,7 +240,6 @@ class DashboardController {
                 }
             });
         } catch (error) {
-            console.error('❌ Error en clearCache:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al limpiar cache',
@@ -278,13 +253,10 @@ class DashboardController {
      */
     async getEstadisticasDiarias(req, res) {
         try {
-            console.log('📅 Procesando solicitud de estadísticas diarias...');
             const startTime = Date.now();
             
             const result = await DashboardService.getEstadisticasDiarias();
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Estadísticas diarias generadas en ${processingTime}ms`);
             
             if (result.success) {
                 result.metadata = {
@@ -297,7 +269,6 @@ class DashboardController {
                 res.status(500).json(result);
             }
         } catch (error) {
-            console.error('❌ Error en DashboardController.getEstadisticasDiarias:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al obtener estadísticas diarias',
@@ -312,13 +283,10 @@ class DashboardController {
      */
     async getEstadisticasPorTipo(req, res) {
         try {
-            console.log('📊 Procesando solicitud de estadísticas por tipo de documento...');
             const startTime = Date.now();
             
             const result = await DashboardService.getEstadisticasTiposDocumento();
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Estadísticas por tipo generadas en ${processingTime}ms`);
             
             const response = {
                 success: true,
@@ -344,9 +312,7 @@ class DashboardController {
             
             res.json(response);
             
-        } catch (error) {
-            console.error('❌ Error en DashboardController.getEstadisticasPorTipo:', error);
-            
+        } catch (error) {            
             // Datos de ejemplo en caso de error
             const datosEjemplo = {
                 total_documentos: 1250,
@@ -392,13 +358,10 @@ class DashboardController {
      */
     async getEstadisticasPorModalidad(req, res) {
         try {
-            console.log('🚌 Procesando solicitud de estadísticas por modalidad...');
             const startTime = Date.now();
             
             const result = await DashboardService.getEstadisticasPorModalidad();
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Estadísticas por modalidad generadas en ${processingTime}ms`);
             
             if (result.success) {
                 result.metadata = {
@@ -412,7 +375,6 @@ class DashboardController {
                 res.status(500).json(result);
             }
         } catch (error) {
-            console.error('❌ Error en DashboardController.getEstadisticasPorModalidad:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al obtener estadísticas por modalidad',
@@ -427,13 +389,10 @@ class DashboardController {
      */
     async getEstadisticasPorMunicipio(req, res) {
         try {
-            console.log('🗺️ Procesando solicitud de estadísticas por municipio...');
             const startTime = Date.now();
             
             const result = await DashboardService.getEstadisticasPorMunicipio();
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Estadísticas por municipio generadas en ${processingTime}ms`);
             
             if (result.success) {
                 result.metadata = {
@@ -447,7 +406,6 @@ class DashboardController {
                 res.status(500).json(result);
             }
         } catch (error) {
-            console.error('❌ Error en DashboardController.getEstadisticasPorMunicipio:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al obtener estadísticas por municipio',
@@ -462,14 +420,11 @@ class DashboardController {
      */
     async getEstadisticasModalidadDetallada(req, res) {
         try {
-            console.log('📊 Procesando solicitud de estadísticas detalladas por modalidad...');
             const filters = req.query;
             const startTime = Date.now();
             
             const result = await DashboardService.getEstadisticasModalidadDetallada(filters);
             const processingTime = Date.now() - startTime;
-            
-            console.log(`✅ Estadísticas detalladas por modalidad generadas en ${processingTime}ms`);
             
             if (result.success) {
                 result.metadata = {
@@ -483,7 +438,6 @@ class DashboardController {
                 res.status(500).json(result);
             }
         } catch (error) {
-            console.error('❌ Error en DashboardController.getEstadisticasModalidadDetallada:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error al obtener estadísticas detalladas por modalidad',

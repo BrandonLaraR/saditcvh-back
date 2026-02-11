@@ -11,10 +11,6 @@ class UsersReportController {
     let doc = null;
     
     try {
-      console.log('=== GENERANDO REPORTE DE USUARIOS ===');
-      console.log('Filtros aplicados:', req.query);
-      console.log('Timestamp:', new Date().toISOString());
-      
       const filters = {
         role_id: req.query.role_id,
         active: req.query.active !== undefined ? req.query.active === 'true' : undefined,
@@ -36,10 +32,6 @@ class UsersReportController {
           data: []
         });
       }
-      
-      // Log para depuración
-      console.log('📊 Total usuarios encontrados:', report.metadata?.total_users || 0);
-      console.log('🔐 Usuarios con permisos detallados:', report.data.filter(u => u.permissions && u.permissions.length > 0).length);
       
       doc = new PDFDocument({
         size: 'A4',
@@ -88,7 +80,6 @@ class UsersReportController {
         try {
           doc.image(escudoPath, 40, 25, { width: 70, height: 70 });
         } catch (err) {
-          console.log('⚠️ Error cargando escudo:', err.message);
         }
       }
       
@@ -900,27 +891,12 @@ if (user.permissions && user.permissions.length > 0) {
       
       // Finalizar
       doc.end();
-      
-      console.log('✅ Reporte detallado de usuarios generado exitosamente');
-      console.log(`📊 Total usuarios: ${totalUsuariosTodos}`);
-      console.log(`📈 Usuarios activos: ${usuariosActivos}`);
-      console.log(`📉 Usuarios inactivos: ${usuariosInactivos}`);
-      console.log(`🎯 Usuarios con rol: ${totalUsuariosConRol}`);
-      console.log(`🚫 Usuarios sin rol: ${totalUsuariosSinRol}`);
-      console.log(`📋 Usuarios incluidos: ${report.data.length}`);
-      console.log(`🔐 Total permisos listados: ${report.data.reduce((sum, user) => sum + ((user.permissions && user.permissions.length) || 0), 0)}`);
-      console.log(`🏙️ Municipios únicos con permisos: ${totalMunicipiosUnicos}`);
-      
     } catch (error) {
-      console.error('❌ Error generando reporte de usuarios:', error);
-      console.error('❌ Stack trace:', error.stack);
-      
       // Si el documento ya comenzó a escribirse, terminarlo limpiamente
       if (doc && !doc._readableState.ended) {
         try {
           doc.end();
         } catch (e) {
-          console.error('❌ Error al finalizar documento:', e.message);
         }
       }
       
@@ -933,7 +909,6 @@ if (user.permissions && user.permissions.length > 0) {
           stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
       } else {
-        console.error('❌ Error después de comenzar a escribir PDF');
       }
     }
   }

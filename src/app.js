@@ -52,7 +52,6 @@ app.use(cookieParser());
 
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/reports') || req.path.startsWith('/api/reportes')) {
-    console.log(`✅ Saltando CSRF para: ${req.path}`);
     return next();
   }
 

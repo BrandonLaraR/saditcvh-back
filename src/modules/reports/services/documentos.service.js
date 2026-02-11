@@ -206,7 +206,6 @@ class DigitalizationReportService {
             };
 
         } catch (error) {
-            console.error('❌ Error en DigitalizationReportService.getDigitalizationReport:', error);
             throw error;
         }
     }
@@ -508,7 +507,6 @@ class DigitalizationReportService {
             };
 
         } catch (error) {
-            console.error('❌ Error en getReportStatistics:', error);
             return {
                 totalDocuments: 0,
                 digitalizedDocuments: 0,
@@ -720,7 +718,6 @@ class DigitalizationReportService {
             };
 
         } catch (error) {
-            console.error('❌ Error en getMunicipalitySummary:', error);
             throw error;
         }
     }
@@ -797,7 +794,6 @@ class DigitalizationReportService {
             };
 
         } catch (error) {
-            console.error('❌ Error en getDigitalizerPerformance:', error);
             throw error;
         }
     }
@@ -844,12 +840,9 @@ class DigitalizationReportService {
                 LIMIT ${parseInt(limit)}
             `;
             
-            console.log('🔍 Ejecutando consulta de documentos recientes...');
             const documentos = await sequelize.query(query, {
                 type: QueryTypes.SELECT
             });
-            
-            console.log(`📄 Documentos recientes encontrados: ${documentos.length}`);
             
             // Procesar datos
             const processedDocuments = documentos.map(doc => ({
@@ -945,7 +938,6 @@ class DigitalizationReportService {
             };
             
         } catch (error) {
-            console.error('❌ Error en getUltimosDocumentos:', error);
             return {
                 success: false,
                 message: 'Error al obtener documentos recientes',
@@ -1110,7 +1102,6 @@ class DigitalizationReportService {
             };
 
         } catch (error) {
-            console.error('❌ Error en getModalidadDetailedReport:', error);
             return {
                 success: false,
                 message: 'Error al obtener reporte detallado por modalidad',

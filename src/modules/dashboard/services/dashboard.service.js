@@ -8,8 +8,6 @@ class DashboardService {
      */
     async getDashboardStats() {
         try {
-            console.log('📊 Obteniendo estadísticas del dashboard...');
-            
             // Ejecutar todas las consultas en paralelo
             const [
                 totalDocumentos,
@@ -35,8 +33,6 @@ class DashboardService {
                 this.getDocumentosPorTipo()
             ]);
 
-            console.log('✅ Estadísticas obtenidas exitosamente');
-            
             return {
                 success: true,
                 data: {
@@ -59,8 +55,6 @@ class DashboardService {
             };
 
         } catch (error) {
-            console.error('❌ Error en DashboardService.getDashboardStats:', error);
-            console.error('❌ Detalles del error:', error.message);
             return {
                 success: false,
                 message: 'Error al obtener estadísticas del dashboard',
@@ -87,7 +81,6 @@ class DashboardService {
             
             return parseInt(result[0].total) || 0;
         } catch (error) {
-            console.error('Error en getTotalDocumentos:', error);
             return 0;
         }
     }
@@ -109,7 +102,6 @@ class DashboardService {
             
             return parseInt(result[0].total_paginas) || 0;
         } catch (error) {
-            console.error('Error en getTotalPaginas:', error);
             return 0;
         }
     }
@@ -132,7 +124,6 @@ class DashboardService {
             
             return parseInt(result[0].total_activos) || 0;
         } catch (error) {
-            console.error('Error en getUsuariosActivos:', error);
             return 0;
         }
     }
@@ -163,7 +154,6 @@ class DashboardService {
             
             return documentosPorEstado;
         } catch (error) {
-            console.error('Error en getDocumentosPorEstado:', error);
             return { 'pendiente': 0, 'completado': 0, 'en_proceso': 0 };
         }
     }
@@ -190,7 +180,6 @@ class DashboardService {
             
             return parseInt(result[0].documentos_hoy) || 0;
         } catch (error) {
-            console.error('Error en getDocumentosHoy:', error);
             return 0;
         }
     }
@@ -218,7 +207,6 @@ class DashboardService {
             
             return parseInt(result[0].documentos_semana) || 0;
         } catch (error) {
-            console.error('Error en getDocumentosSemana:', error);
             return 0;
         }
     }
@@ -245,7 +233,6 @@ class DashboardService {
             
             return parseInt(result[0].usuarios_hoy) || 0;
         } catch (error) {
-            console.error('Error en getUsuariosNuevosHoy:', error);
             return 0;
         }
     }
@@ -273,7 +260,6 @@ class DashboardService {
             
             return parseInt(result[0]?.busquedas_hoy) || 0;
         } catch (error) {
-            console.warn('Advertencia en getBusquedasHoy: No se pudo obtener datos de búsquedas');
             // Valor simulado para desarrollo
             return Math.floor(Math.random() * 50) + 10;
         }
@@ -304,7 +290,6 @@ class DashboardService {
             
             return archivosPorTipo;
         } catch (error) {
-            console.error('Error en getArchivosPorTipo:', error);
             return { 'application/pdf': 0 };
         }
     }
@@ -335,7 +320,6 @@ class DashboardService {
             
             return documentosPorTipo;
         } catch (error) {
-            console.error('Error en getDocumentosPorTipo:', error);
             return { 'sin_tipo': 0 };
         }
     }
@@ -460,7 +444,6 @@ class DashboardService {
             };
 
         } catch (error) {
-            console.error('❌ Error en getAdvancedStats:', error);
             return {
                 success: false,
                 message: 'Error al obtener estadísticas avanzadas',
@@ -510,7 +493,6 @@ class DashboardService {
                 }
             };
         } catch (error) {
-            console.error('❌ Error en getChartData:', error);
             return {
                 success: false,
                 message: 'Error al obtener datos para gráficas',
@@ -543,7 +525,6 @@ class DashboardService {
             
             return result;
         } catch (error) {
-            console.error('Error en getDocumentosPorMesChart:', error);
             return [];
         }
     }
@@ -572,7 +553,6 @@ class DashboardService {
             
             return result;
         } catch (error) {
-            console.error('Error en getDocumentosPorEstadoChart:', error);
             return [];
         }
     }
@@ -596,7 +576,6 @@ class DashboardService {
             
             return result;
         } catch (error) {
-            console.error('Error en getDocumentosPorTipoChart:', error);
             return [];
         }
     }
@@ -625,7 +604,6 @@ class DashboardService {
             
             return result;
         } catch (error) {
-            console.error('Error en getDocumentosUltimos7Dias:', error);
             return [];
         }
     }    
@@ -655,7 +633,6 @@ class DashboardService {
                 }
             };
         } catch (error) {
-            console.error('❌ Error en getEstadisticasDiarias:', error);
             return {
                 success: false,
                 message: 'Error al obtener estadísticas diarias',
@@ -684,7 +661,6 @@ class DashboardService {
             
             return result;
         } catch (error) {
-            console.error('Error en getDocumentosPorEstadoUltimos7Dias:', error);
             return [];
         }
     }
@@ -709,7 +685,6 @@ class DashboardService {
             
             return result;
         } catch (error) {
-            console.error('Error en getDocumentosPorTipoUltimos7Dias:', error);
             return [];
         }
     }
@@ -720,9 +695,7 @@ class DashboardService {
      * Obtiene el total de documentos por tipo de autorización (Permiso/Concesión)
      */
     async getDocumentosPorTipoAutorizacion() {
-        try {
-            console.log('📊 Obteniendo documentos por tipo de autorización...');
-            
+        try {   
             const query = `
                 SELECT 
                     ta.nombre as tipo_autorizacion,
@@ -809,7 +782,6 @@ class DashboardService {
             return finalResult.sort((a, b) => b.cantidad - a.cantidad);
             
         } catch (error) {
-            console.error('❌ Error en getDocumentosPorTipoAutorizacion:', error);
             return [
                 { tipo_autorizacion: 'Permiso', abreviatura: 'P', cantidad: 0, porcentaje: 0 },
                 { tipo_autorizacion: 'Concesión', abreviatura: 'C', cantidad: 0, porcentaje: 0 }
@@ -822,8 +794,6 @@ class DashboardService {
    */
   async getEstadisticasTiposDocumento() {
       try {
-          console.log('📊 Obteniendo estadísticas por tipo de documento...');
-          
           // Obtener total de documentos
           const totalDocumentos = await this.getTotalDocumentos();
           
@@ -880,8 +850,6 @@ class DashboardService {
           };
           
       } catch (error) {
-          console.error('❌ Error en getEstadisticasTiposDocumento:', error);
-          
           // Datos por defecto en caso de error
           return {
               total_documentos: 0,
@@ -913,8 +881,6 @@ class DashboardService {
    */
   async getEstadisticasPorModalidad() {
       try {
-          console.log('📊 Obteniendo estadísticas por modalidad...');
-          
           const query = `
               SELECT 
                   m.id as modalidad_id,
@@ -1003,7 +969,6 @@ class DashboardService {
           };
           
       } catch (error) {
-          console.error('❌ Error en getEstadisticasPorModalidad:', error);
           return {
               success: false,
               message: 'Error al obtener estadísticas por modalidad',
@@ -1017,9 +982,7 @@ class DashboardService {
    * Obtiene estadísticas de documentos por municipio
    */
   async getEstadisticasPorMunicipio() {
-      try {
-          console.log('📊 Obteniendo estadísticas por municipio...');
-          
+      try {  
           const query = `
               SELECT 
                   mun.id as municipio_id,
@@ -1112,7 +1075,6 @@ class DashboardService {
           };
           
       } catch (error) {
-          console.error('❌ Error en getEstadisticasPorMunicipio:', error);
           return {
               success: false,
               message: 'Error al obtener estadísticas por municipio',
@@ -1206,7 +1168,6 @@ class DashboardService {
           };
 
       } catch (error) {
-          console.error('❌ Error en getEstadisticasModalidadDetallada:', error);
           return {
               success: false,
               message: 'Error al obtener estadísticas detalladas por modalidad',
