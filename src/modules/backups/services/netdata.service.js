@@ -4,58 +4,59 @@ const NETDATA_URL = 'http://localhost:19999';
 
 /**
  * Obtiene datos crudos de Netdata
- * @param {string} chart - ID del chart
- * @param {number} points - Cantidad de registros (after: -points)
+ * @param {string} chart - ID del chart (ej: system.cpu, disk_space./data)
+ * @param {number} points - Cantidad de registros a recuperar
  */
 async function fetchFromNetdata(chart, points = 1) {
     try {
         const res = await axios.get(`${NETDATA_URL}/api/v1/data`, {
             params: {
                 chart,
+                // after: -60 garantiza un rango, points: 60 garantiza la resolución
                 after: -Math.abs(points),
-                points: points, // Forzamos la cantidad de puntos
+                points: points,
                 format: 'json'
             }
         });
-        return res.data; // { labels, data: [ [], [] ] }
+        return res.data; // Retorna { labels, data: [ [...] ] }
     } catch (error) {
-        console.error(`Netdata Error (${chart}):`, error.message);
+        console.error(`Netdata Error en chart [${chart}]:`, error.message);
         return null;
     }
 }
 
 /**
- * Almacenamiento Estático (Disco y Archivos)
+ * Almacenamiento y Archivos (Baja frecuencia)
+ * Consulta el espacio en disco y el uso de inodos (archivos)
  */
 async function getStorageData() {
-    // Usamos el chart que confirmamos que existe
-    const disk = await fetchFromNetdata('disk_space./data', 1);
-    
-    // Simulación de conteo de archivos/carpetas (Genérico)
-    const fileStats = {
-        total: 85420,
-        folders: 1240
-    };
+    const [diskRaw, inodesRaw] = await Promise.all([
+        fetchFromNetdata('disk_space./data', 1),
+        fetchFromNetdata('disk_inodes./data', 1)
+    ]);
 
     return {
-        disk: disk || { labels: ['avail', 'used'], data: [[0, 0]] },
-        files: fileStats
+        // Datos crudos del espacio en disco
+        disk: diskRaw || { labels: ['time', 'avail', 'used'], data: [[0, 0, 0]] },
+        // Datos crudos de inodos (representan la cantidad de archivos/carpetas)
+        inodes: inodesRaw || { labels: ['time', 'avail', 'used'], data: [[0, 0, 0]] }
     };
 }
 
 /**
- * Rendimiento con Historial (CPU y RAM)
+ * Rendimiento de CPU y RAM (Alta frecuencia)
+ * Trae los últimos 60 puntos para alimentar las gráficas de historial
  */
 async function getLivePerformance() {
-    // Pedimos 30 puntos para que la gráfica de Angular se vea con movimiento
     const [cpuRaw, ramRaw] = await Promise.all([
-        fetchFromNetdata('system.cpu', 30),
-        fetchFromNetdata('system.ram', 30)
+        // Pedimos 60 puntos para una gráfica más detallada (1 minuto de historial)
+        fetchFromNetdata('system.cpu', 60),
+        fetchFromNetdata('system.ram', 60)
     ]);
 
     return {
-        cpu: cpuRaw || { labels: ['idle'], data: [[100]] },
-        ram: ramRaw || { labels: ['used', 'free'], data: [[0, 0]] }
+        cpu: cpuRaw || { labels: ['time', 'idle'], data: [[0, 100]] },
+        ram: ramRaw || { labels: ['time', 'free', 'used'], data: [[0, 0, 0]] }
     };
 }
 
