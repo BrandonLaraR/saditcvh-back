@@ -203,7 +203,7 @@ class OCRProcessorService {
             }
 
             // 2. Esperar procesamiento
-            const estado = await this.verificarEstadoOCR(envio.taskId);
+            const estado = await this.verificarEstadoOCRUnico(envio.taskId);
             if (!estado.success) {
                 throw new Error(estado.error);
             }
