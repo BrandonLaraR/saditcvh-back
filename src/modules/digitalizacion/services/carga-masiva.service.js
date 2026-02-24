@@ -252,7 +252,7 @@ class CargaMasivaService {
 
                 if (resultadoOCR.success) {
                     bufferFinal = resultadoOCR.pdfBuffer;
-                    textoOCR = resultadoOCR.text;
+                    textoOCRFinal = resultadoOCR.text;
                     estadoOCR = 'completado';
                 } else {
                     estadoOCR = 'fallido';
@@ -327,7 +327,7 @@ class CargaMasivaService {
                 checksum_md5: checksumMd5,
                 checksum_sha256: checksumSha256,
                 estado_ocr: estadoOCR,
-                texto_ocr: textoOCR, // NUEVO: guardar texto extraído
+                texto_ocr: textoOCRFinal, // NUEVO: guardar texto extraído
                 // fecha_digitalizacion: new Date(),
                 digitalizado_por: userId,
                 version_archivo: version,
