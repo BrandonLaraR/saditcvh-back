@@ -404,94 +404,8 @@ class CargaMasivaService {
     }
 
     // Método principal para procesar carga masiva
-    async procesarCargaMasiva(archivos, userId, opciones = {}) {
-        const { useOcr = false, loteSize = 5 } = opciones; // Reducir loteSize para OCR
-
-        try {
-            const resultados = {
-                total: archivos.length,
-                exitosos: 0,
-                fallidos: 0,
-                conOCR: useOcr,
-                detalles: []
-            };
-
-            // Para OCR, procesar secuencialmente o en lotes pequeños
-            if (useOcr) {
-                // Procesar uno por uno para no saturar Python
-                for (const archivo of archivos) {
-                    try {
-                        const datosArchivo = this.parsearNombreArchivo(archivo.nombre);
-                        const autorizacionInfo = await this.buscarOCrearAutorizacion(datosArchivo, userId);
-
-                        const resultado = await this.procesarArchivoMasivo(
-                            { ...archivo, nombreOriginal: datosArchivo.nombreOriginal },
-                            autorizacionInfo,
-                            userId,
-                            { useOcr: true } // Pasar opción de OCR
-                        );
-
-                        resultados.exitosos++;
-                        resultados.detalles.push({
-                            archivo: archivo.nombre,
-                            exito: true,
-                            ...resultado
-                        });
-                    } catch (error) {
-                        resultados.fallidos++;
-                        resultados.detalles.push({
-                            archivo: archivo.nombre,
-                            exito: false,
-                            error: error.message
-                        });
-                    }
-                }
-            } else {
-                // Procesamiento normal en lotes paralelos
-                for (let i = 0; i < archivos.length; i += loteSize) {
-                    const lote = archivos.slice(i, i + loteSize);
-                    const promesas = lote.map(async (archivo) => {
-                        try {
-                            // Parsear nombre del archivo
-                            const datosArchivo = this.parsearNombreArchivo(archivo.nombre);
-
-                            // Buscar o crear autorización
-                            const autorizacionInfo = await this.buscarOCrearAutorizacion(datosArchivo, userId);
-
-                            // Procesar archivo
-                            const resultado = await this.procesarArchivoMasivo({
-                                ...archivo,
-                                nombreOriginal: datosArchivo.nombreOriginal
-                            }, autorizacionInfo, userId);
-
-                            resultados.exitosos++;
-                            resultados.detalles.push({
-                                archivo: archivo.nombre,
-                                exito: true,
-                                ...resultado
-                            });
-                        } catch (error) {
-                            resultados.fallidos++;
-                            resultados.detalles.push({
-                                archivo: archivo.nombre,
-                                exito: false,
-                                error: error.message
-                            });
-                        }
-                    });
-                    await Promise.all(promesas);
-                }
-            }
-
-            return resultados;
-        } catch (error) {
-            throw new Error(`Error en carga masiva: ${error.message}`);
-        }
-    }
-    // se hixo esta versio  para rgistrear logf apesar de que es sin ocr 
-
     // async procesarCargaMasiva(archivos, userId, opciones = {}) {
-    //     const { useOcr = false, loteSize = 5, loteId = null, origen = 'DIRECTO' } = opciones; // Reducir loteSize para OCR
+    //     const { useOcr = false, loteSize = 5 } = opciones; // Reducir loteSize para OCR
 
     //     try {
     //         const resultados = {
@@ -537,8 +451,6 @@ class CargaMasivaService {
     //             for (let i = 0; i < archivos.length; i += loteSize) {
     //                 const lote = archivos.slice(i, i + loteSize);
     //                 const promesas = lote.map(async (archivo) => {
-    //                     let proceso = null; // importante para poder actualizarlo en catch
-
     //                     try {
     //                         // Parsear nombre del archivo
     //                         const datosArchivo = this.parsearNombreArchivo(archivo.nombre);
@@ -546,41 +458,11 @@ class CargaMasivaService {
     //                         // Buscar o crear autorización
     //                         const autorizacionInfo = await this.buscarOCrearAutorizacion(datosArchivo, userId);
 
-    //                         // ================================
-    //                         //  CREAR REGISTRO (ANTES DE PROCESAR)
-    //                         // ================================
-    //                         proceso = await this.ocrProcesoModel.create({
-    //                             lote_id: loteId || `lote_sync_${Date.now()}_${userId}`,
-    //                             archivo_id: `sync_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    //                             nombre_archivo: archivo.nombre,
-    //                             autorizacion_id: autorizacionInfo.autorizacion.id,
-    //                             user_id: userId,
-    //                             estado: 'procesando',
-    //                             tipo_proceso: 'NORMAL',
-    //                             origen: origen,
-    //                             metadata: {
-    //                                 useOcr,
-    //                                 tamano: archivo.tamano
-    //                             }
-
-    //                         });
-
-    //                         // ================================
-    //                         //  PROCESAR ARCHIVO
-    //                         // ================================
+    //                         // Procesar archivo
     //                         const resultado = await this.procesarArchivoMasivo({
     //                             ...archivo,
     //                             nombreOriginal: datosArchivo.nombreOriginal
     //                         }, autorizacionInfo, userId);
-
-    //                         // ================================
-    //                         //  ACTUALIZAR A COMPLETADO
-    //                         // ================================
-    //                         await proceso.update({
-    //                             estado: 'completado',
-    //                             documento_id: resultado.documentoId,
-    //                             fecha_procesado: new Date()
-    //                         });
 
     //                         resultados.exitosos++;
     //                         resultados.detalles.push({
@@ -588,19 +470,7 @@ class CargaMasivaService {
     //                             exito: true,
     //                             ...resultado
     //                         });
-
     //                     } catch (error) {
-
-    //                         // ================================
-    //                         //  ACTUALIZAR A FALLADO
-    //                         // ================================
-    //                         if (proceso) {
-    //                             await proceso.update({
-    //                                 estado: 'fallado',
-    //                                 error: error.message
-    //                             });
-    //                         }
-
     //                         resultados.fallidos++;
     //                         resultados.detalles.push({
     //                             archivo: archivo.nombre,
@@ -609,7 +479,6 @@ class CargaMasivaService {
     //                         });
     //                     }
     //                 });
-
     //                 await Promise.all(promesas);
     //             }
     //         }
@@ -619,6 +488,137 @@ class CargaMasivaService {
     //         throw new Error(`Error en carga masiva: ${error.message}`);
     //     }
     // }
+    // se hixo esta versio  para rgistrear logf apesar de que es sin ocr 
+
+    async procesarCargaMasiva(archivos, userId, opciones = {}) {
+        const { useOcr = false, loteSize = 5, loteId = null, origen = 'DIRECTO' } = opciones; // Reducir loteSize para OCR
+
+        try {
+            const resultados = {
+                total: archivos.length,
+                exitosos: 0,
+                fallidos: 0,
+                conOCR: useOcr,
+                detalles: []
+            };
+
+            // Para OCR, procesar secuencialmente o en lotes pequeños
+            if (useOcr) {
+                // Procesar uno por uno para no saturar Python
+                for (const archivo of archivos) {
+                    try {
+                        const datosArchivo = this.parsearNombreArchivo(archivo.nombre);
+                        const autorizacionInfo = await this.buscarOCrearAutorizacion(datosArchivo, userId);
+
+                        const resultado = await this.procesarArchivoMasivo(
+                            { ...archivo, nombreOriginal: datosArchivo.nombreOriginal },
+                            autorizacionInfo,
+                            userId,
+                            { useOcr: true } // Pasar opción de OCR
+                        );
+
+                        resultados.exitosos++;
+                        resultados.detalles.push({
+                            archivo: archivo.nombre,
+                            exito: true,
+                            ...resultado
+                        });
+                    } catch (error) {
+                        resultados.fallidos++;
+                        resultados.detalles.push({
+                            archivo: archivo.nombre,
+                            exito: false,
+                            error: error.message
+                        });
+                    }
+                }
+            } else {
+                // Procesamiento normal en lotes paralelos
+                for (let i = 0; i < archivos.length; i += loteSize) {
+                    const lote = archivos.slice(i, i + loteSize);
+                    const promesas = lote.map(async (archivo) => {
+                        let proceso = null; // importante para poder actualizarlo en catch
+
+                        try {
+                            // Parsear nombre del archivo
+                            const datosArchivo = this.parsearNombreArchivo(archivo.nombre);
+
+                            // Buscar o crear autorización
+                            const autorizacionInfo = await this.buscarOCrearAutorizacion(datosArchivo, userId);
+
+                            // ================================
+                            //  CREAR REGISTRO (ANTES DE PROCESAR)
+                            // ================================
+                            proceso = await this.ocrProcesoModel.create({
+                                lote_id: loteId || `lote_sync_${Date.now()}_${userId}`,
+                                archivo_id: `sync_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                                nombre_archivo: archivo.nombre,
+                                autorizacion_id: autorizacionInfo.autorizacion.id,
+                                user_id: userId,
+                                estado: 'procesando',
+                                tipo_proceso: 'NORMAL',
+                                origen: origen,
+                                metadata: {
+                                    useOcr,
+                                    tamano: archivo.tamano
+                                }
+
+                            });
+
+                            // ================================
+                            //  PROCESAR ARCHIVO
+                            // ================================
+                            const resultado = await this.procesarArchivoMasivo({
+                                ...archivo,
+                                nombreOriginal: datosArchivo.nombreOriginal
+                            }, autorizacionInfo, userId);
+
+                            // ================================
+                            //  ACTUALIZAR A COMPLETADO
+                            // ================================
+                            await proceso.update({
+                                estado: 'completado',
+                                documento_id: resultado.documentoId,
+                                fecha_procesado: new Date()
+                            });
+
+                            resultados.exitosos++;
+                            resultados.detalles.push({
+                                archivo: archivo.nombre,
+                                exito: true,
+                                ...resultado
+                            });
+
+                        } catch (error) {
+
+                            // ================================
+                            //  ACTUALIZAR A FALLADO
+                            // ================================
+                            if (proceso) {
+                                await proceso.update({
+                                    estado: 'fallado',
+                                    error: error.message
+                                });
+                            }
+
+                            resultados.fallidos++;
+                            resultados.detalles.push({
+                                archivo: archivo.nombre,
+                                exito: false,
+                                error: error.message
+                            });
+                        }
+                    });
+
+                    await Promise.all(promesas);
+                }
+            }
+
+            return resultados;
+        } catch (error) {
+            throw new Error(`Error en carga masiva: ${error.message}`);
+        }
+    }
 
     // Método para recibir archivos directamente (no comprimidos)
     async procesarArchivosDirectos(archivos, userId, opciones = {}) {
@@ -940,6 +940,16 @@ class CargaMasivaService {
             console.log("textResult:", textResult);
             console.log("typeof textResult.text:", typeof textResult.text);
             console.log("isArray:", Array.isArray(textResult.text));
+            // =============================
+            //  VALIDAR QUE OCR YA TERMINÓ
+            // =============================
+            if (
+                !textResult?.success ||
+                typeof textResult.text !== 'string'
+            ) {
+                console.log('OCR aún no listo, no se finaliza todavía');
+                return { success: false, retry: true };
+            }
             if (pdfResult.error || textResult.error) {
                 if (pdfResult.error?.includes('404') || textResult.error?.includes('404')) {
                     console.log(`Recursos aún no disponibles para ${proceso.nombreArchivo}, reintentando...`);
