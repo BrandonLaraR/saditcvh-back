@@ -292,7 +292,12 @@ class DocumentoController {
 
             const basePath = process.env.FILE_STORAGE_PATH || path.resolve(__dirname, '../../../storage');
 
-            const filePath = path.join(basePath, archivo.ruta_almacenamiento);
+            const normalizedPath = path.normalize(archivo.ruta_almacenamiento);
+            const filePath = path.join(basePath, normalizedPath);
+
+            if (!filePath.startsWith(basePath)) {
+                return res.status(403).json({ message: 'Ruta inválida' });
+            }
 
             if (!fs.existsSync(filePath)) {
                 return res.status(404).json({
@@ -305,7 +310,7 @@ class DocumentoController {
             res.setHeader('Accept-Ranges', 'bytes');
 
             const ENABLE_X_ACCEL = process.env.ENABLE_X_ACCEL === 'true';
-            
+
             if (ENABLE_X_ACCEL) {
                 const internalPath = `${process.env.NGINX_INTERNAL_PATH}/${archivo.ruta_almacenamiento.replace(/\\/g, '/')}`;
                 res.setHeader('X-Accel-Redirect', internalPath);
