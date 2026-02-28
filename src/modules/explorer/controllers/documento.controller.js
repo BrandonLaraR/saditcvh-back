@@ -276,6 +276,114 @@ class DocumentoController {
         }
     }
 
+    async preview(req, res) {
+        try {
+            const { id } = req.params;
+            const userId = req.user.id;
+
+            const archivo = await documentoService.obtenerArchivoPorDocumentoId(id);
+
+            if (!archivo) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Archivo no encontrado'
+                });
+            }
+
+            const basePath = process.env.FILE_STORAGE_PATH || path.resolve(__dirname, '../../../storage');
+
+            const normalizedPath = path.normalize(archivo.ruta_almacenamiento);
+            const filePath = path.join(basePath, normalizedPath);
+
+            if (!filePath.startsWith(basePath)) {
+                return res.status(403).json({ message: 'Ruta inválida' });
+            }
+
+            if (!fs.existsSync(filePath)) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Archivo físico no encontrado'
+                });
+            }
+
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Accept-Ranges', 'bytes');
+
+            const ENABLE_X_ACCEL = process.env.ENABLE_X_ACCEL === 'true';
+
+            if (ENABLE_X_ACCEL) {
+                const internalPath = `${process.env.NGINX_INTERNAL_PATH}/${archivo.ruta_almacenamiento.replace(/\\/g, '/')}`;
+                res.setHeader('X-Accel-Redirect', internalPath);
+                await auditService.createLog(req, {
+                    action: 'VIEW_DOCUMENT',
+                    module: 'Explorador',
+                    entityId: archivo.id,
+                    details: {
+                        message: 'Archivo visualizado correctamente',
+                        archivoId: archivo.id,
+                        documentId: archivo.documento_id,
+                        fileName: archivo.nombre_archivo,
+                        viewedBy: userId,
+                        status: 'SUCCESS'
+                    }
+                });
+                return res.status(200).end();
+            }
+
+            // ======================
+            // Desarrollo con Range
+            // ======================
+
+            const stat = fs.statSync(filePath);
+            const range = req.headers.range;
+
+            if (range) {
+                const parts = range.replace(/bytes=/, "").split("-");
+                const start = parseInt(parts[0], 10);
+                const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1;
+
+                const chunkSize = (end - start) + 1;
+                const file = fs.createReadStream(filePath, { start, end });
+
+                res.writeHead(206, {
+                    'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+                    'Accept-Ranges': 'bytes',
+                    'Content-Length': chunkSize,
+                    'Content-Type': 'application/pdf'
+                });
+
+                return file.pipe(res);
+            }
+
+            res.writeHead(200, {
+                'Content-Length': stat.size,
+                'Content-Type': 'application/pdf'
+            });
+
+            fs.createReadStream(filePath).pipe(res);
+
+        } catch (error) {
+            console.error(error);
+            await auditService.createLog(req, {
+                action: 'VIEW_DOCUMENT',
+                module: 'Explorador',
+                entityId: archivoId,
+                details: {
+                    message: 'Error al visualizar archivo',
+                    archivoId,
+                    documentId: archivo.documento_id,
+                    fileName: archivo.nombre_archivo,
+                    downloadedBy: userId,
+                    status: 'ERROR',
+                }
+            });
+            res.status(500).json({
+                success: false,
+                message: 'Error al previsualizar documento'
+            });
+        }
+    }
+
     // async descargarArchivo(req, res) {
     //     try {
     //         const { archivoId } = req.params;

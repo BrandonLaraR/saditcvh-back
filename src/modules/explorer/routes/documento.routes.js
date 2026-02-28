@@ -17,6 +17,7 @@ router.use(protect);
 router.get('/', documentoController.search);
 router.get('/estadisticas', documentoController.getEstadisticas);
 router.get('/autorizacion/:autorizacionId', documentoController.getByAutorizacion);
+router.get('/:id/preview', documentoController.preview);
 router.get('/:id', documentoController.getById);
 
 // =====================
